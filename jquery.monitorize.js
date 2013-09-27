@@ -49,7 +49,7 @@
                     data.isQuestionDirty = true;
 
                     // Skip if didn't pressed a triggering key code
-                    if (!$.inArray(e.keyCode, options.triggerKeyCodes)) {
+                    if ($.inArray(e.keyCode, options.triggerKeyCodes) === -1) {
                         return;
                     }
 
