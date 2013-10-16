@@ -5,7 +5,6 @@
 *
 * Copyright 2013, Cristian Pallarés
 * Released under the MIT license.
-* https://github.com/skyrpex/jquery.monitorize.js
 */
 (function ($) {
     "use strict";
