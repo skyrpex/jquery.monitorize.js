@@ -1,5 +1,5 @@
 /**
-* jquery.monitorize.js v1.0
+* jquery.monitorize.js v1.1
 * Monitorize input changes in a smart way
 * https://github.com/skyrpex/jquery.monitorize.js
 *
