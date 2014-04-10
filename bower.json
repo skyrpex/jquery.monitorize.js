@@ -1,0 +1,15 @@
+{
+  "name": "jquery.monitorize",
+  "version": "1.1.0",
+  "main": [
+    "jquery.monitorize.js"
+  ],
+  "dependencies": {
+    "jquery": ">=1.2.3"
+  },
+  "ignore": [
+    "LICENSE",
+    "README.md",
+    "example.html"
+  ]
+}

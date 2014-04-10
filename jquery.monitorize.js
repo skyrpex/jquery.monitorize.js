@@ -1,12 +1,20 @@
 /**
-* jquery.monitorize.js v1.0
+* jquery.monitorize.js v1.1
 * Monitorize input changes in a smart way
 * https://github.com/skyrpex/jquery.monitorize.js
 *
-* Copyright 2013, Cristian Pallarés
+* Copyright 2014, Cristian Pallarés
 * Released under the MIT license.
 */
-(function ($) {
+(function (factory) {
+if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module depending on jQuery.
+    define(['jquery'], factory);
+} else {
+    // No AMD. Register plugin with global jQuery object.
+    factory(jQuery);
+}
+}(function ($) {
     "use strict";
 
     var methods = {
@@ -134,4 +142,4 @@
         $.error('Method ' +  method + ' does not exist on jQuery.monitorize');
 
     };
-})(jQuery);
+}));
