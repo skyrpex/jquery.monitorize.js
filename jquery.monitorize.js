@@ -3,7 +3,7 @@
 * Monitorize input changes in a smart way
 * https://github.com/skyrpex/jquery.monitorize.js
 *
-* Copyright 2013, Cristian Pallarés
+* Copyright 2014, Cristian Pallarés
 * Released under the MIT license.
 */
 (function ($) {
