@@ -2,7 +2,7 @@
   "name": "jquery.monitorize",
   "version": "1.1.0",
   "main": [
-    "jquery.monitorize.js"
+    "dist/jquery.monitorize.min.js"
   ],
   "dependencies": {
     "jquery": ">=1.2.3"
