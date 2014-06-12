@@ -94,8 +94,8 @@
 
                     }
 
-                    // Do ask
-                    methods._ask.call(this);
+                    // Maybe call callback
+                    methods._maybeCallCallback.call(this);
 
                 });
 
@@ -107,8 +107,8 @@
 
                     data.isValueDirty = true;
 
-                    // Don't ask: value isn't accessible yet
-                    // methods._ask.call(this);
+                    // Don't call callback: value isn't accessible yet
+                    // methods._maybeCallCallback.call(this);
 
                 });
 
@@ -120,8 +120,8 @@
 
                     data.isValueDirty = true;
 
-                    // Do ask
-                    methods._ask.call(this);
+                    // Maybe call callback
+                    methods._maybeCallCallback.call(this);
 
                 });
 
@@ -132,7 +132,7 @@
 
         },
 
-        _ask: function () {
+        _maybeCallCallback: function () {
 
             // Trim value
             var value = $.trim($(this).val()),
@@ -142,7 +142,7 @@
                 options = $(this).data('monitorize').options;
 
             // Skip if value didn't changed
-            if (!data.isValueDirty ||value === data.lastValue) {
+            if (!data.isValueDirty || value === data.lastValue) {
 
                 return;
 
@@ -155,9 +155,6 @@
 
             }
 
-            // Ask using the callback
-            options.onValueChanged(value);
-
             // Reset the timer
             methods._restartTimer.call(this);
 
@@ -166,6 +163,9 @@
 
             // Value is not dirty anymore
             data.isValueDirty = false;
+
+            // Call onValueChanged
+            options.onValueChanged(value);
 
         },
 
@@ -188,7 +188,7 @@
 
                 data.timer = setInterval(function () {
 
-                    methods._ask.call(self);
+                    methods._maybeCallCallback.call(self);
 
                 }, options.frequency);
 
