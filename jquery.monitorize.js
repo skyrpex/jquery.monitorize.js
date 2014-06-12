@@ -29,30 +29,20 @@
         init: function (options) {
 
             // Options
-            var o = $.extend({
+            options = $.extend({
 
                     frequency: 3500,
 
-                    onValueChanged: null,
+                    onValueChanged: $.noop,
 
                     triggerKeyCodes: [
-                        // 8,   // Backspace
-                        // 32,  // Space
                         188, // Comma
                         190, // Dot
-                        // 49,
-                        // 56,
-                        // 219,
-                        // 188,
-                        // 190,
-                        // 191,
-                        // 221,
-                        // 222
                     ],
 
                     skipEmptyValue: true
 
-                }, options),
+                }, options || {}),
 
                 self = this;
 
@@ -61,7 +51,7 @@
                 // Setup options and private data
                 self.data('monitorize', {
 
-                    options: o,
+                    options: options,
 
                     _data: {
 
@@ -78,9 +68,7 @@
                 // Bind keyup event
                 $(this).keyup(function (e) {
 
-                    var data = $(this).data('monitorize')._data,
-
-                        options = $(this).data('monitorize').options;
+                    var data = $(this).data('monitorize')._data;
 
                     // Mark value as dirty
                     data.isValueDirty = true;
@@ -132,6 +120,14 @@
 
         },
 
+        destroy: function () {
+
+            methods._clearTimer.call(this);
+
+            $(this).data('monitorize', null);
+
+        },
+
         _maybeCallCallback: function () {
 
             // Trim value
@@ -165,8 +161,26 @@
             data.isValueDirty = false;
 
             // Call onValueChanged
-            options.onValueChanged(value);
+            try {
+                options.onValueChanged(value);
+            } catch (error) {
+                // $.error('Error catched in onValueChanged (' +  error + ')');
+            }
 
+        },
+        
+        _clearTimer: function () {
+            
+            var self = this,
+
+                data = $(this).data('monitorize')._data;
+            
+            if (data.timer) {
+
+                clearInterval(data.timer);
+
+            }
+            
         },
 
         _restartTimer: function () {
@@ -177,12 +191,7 @@
 
                 options = $(this).data('monitorize').options;
 
-
-            if (data.timer) {
-
-                clearInterval(data.timer);
-
-            }
+            methods._clearTimer.call(this);
 
             if (options.frequency) {
 

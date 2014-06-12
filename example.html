@@ -1,16 +1,20 @@
 <!doctype html>
 <html>
   <head>
-  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="./jquery.monitorize.js"></script>
 		<script>
-			$(document).ready(function() {
+			$(document).ready(function () {
+
 				$('textarea').monitorize({
 					frequency: 1000,
-					onQuestionAsked: function(question) {
-						console.log(question);
+					onValueChanged: function (value) {
+
+						console.log(value);
+
 					}
 				});
+				
 			});
 		</script>
 	</head>
