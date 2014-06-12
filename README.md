@@ -1,4 +1,4 @@
 jquery.monitorize.js
 ====================
 
-Monitorize question changes the smart way
+Monitorize input element changes by time and key triggers
