@@ -6,7 +6,7 @@ Monitorize input element changes by time and key triggers
 
 ### init
 
-```
+```javascript
 $('input').monitorize({/* options */});
 // or...
 $('input').monitorize('init', {/* options */});
@@ -16,7 +16,7 @@ Initializes the monitorize plugin on the given jQuery objects.
 
 The default options are:
 
-```
+```javascript
 $('input').monitorize({
 	// Function that will be called when the input changes
     onValueChanged: $.noop,
@@ -36,7 +36,7 @@ $('input').monitorize({
 
 ### destroy
 
-```
+```javascript
 $('input').monitorize('destroy');
 ```
 
