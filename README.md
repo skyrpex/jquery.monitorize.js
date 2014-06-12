@@ -4,7 +4,7 @@ Monitorize input element changes by time and key triggers
 
 ## API
 
-# init
+### init
 
 ```
 $('input').monitorize({/* options */});
@@ -34,7 +34,7 @@ $('input').monitorize({
 });
 ```
 
-# destroy
+### destroy
 
 ```
 $('input').monitorize('destroy');
