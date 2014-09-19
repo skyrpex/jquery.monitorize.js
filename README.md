@@ -30,7 +30,11 @@ $('input').monitorize({
     // Specify if pasting into the input triggers onValueChanged
     pasteTriggers: true,
     // Specify if emptying the input value will trigger onValueChanged
-    emptyValueTriggers: true
+    emptyValueTriggers: true,
+    // Specify if starting monitorize on non-empty inputs will trigger onValueChanged
+    triggerOnInit: true,
+    // Specify if the elements should be monitorized all as one
+    monitorizeAsGroup: false
 });
 ```
 

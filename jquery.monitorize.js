@@ -1,5 +1,5 @@
 /**
-* jquery.monitorize.js v1.3
+* jquery.monitorize.js v1.4
 * Monitorize input changes in a smart way
 * https://github.com/skyrpex/jquery.monitorize.js
 *
@@ -24,48 +24,89 @@
     
     "use strict";
 
+    var defaultOptions = {
+        frequency: 3500,
+
+        onValueChanged: $.noop,
+
+        triggerKeyCodes: [
+            188, // Comma
+            190  // Dot
+        ],
+
+        pasteTriggers: true,
+
+        emptyValueTriggers: true,
+
+        triggerOnInit: true,
+
+        monitorizeAsGroup: false
+
+    };
+
     var methods = {
 
         init: function (options) {
 
             // Options
-            options = $.extend({
+            options = $.extend(defaultOptions, options || {}),
 
-                    frequency: 3500,
+            self = this;
 
-                    onValueChanged: $.noop,
+            var groupMonitor = null;
 
-                    triggerKeyCodes: [
-                        188, // Comma
-                        190, // Dot
-                    ],
+            if (options.monitorizeAsGroup) {
 
-                    pasteTriggers: true,
+                groupMonitor = {
 
-                    emptyValueTriggers: true
+                    timer: null,
 
-                }, options || {}),
+                    isValueDirty: false,
 
-                self = this;
+                    lastInputChanged: null
 
-            return this.each(function () {
+                };
+
+            }
+
+            var monitorizedGroup = this.each(function () {
 
                 // Setup options and private data
-                self.data('monitorize', {
+                $(this).data('monitorize', {
 
                     options: options,
 
                     _data: {
 
-                        isValueDirty: $(this).val(),
-
                         lastValue: null,
 
-                        timer: null
+                        // If we are monitoring a group, use a common object,
+                        //  otherwise use a particular object for each element
+                        group: groupMonitor || {
+
+                            timer: null,
+
+                            isValueDirty: $(this).val() && options.triggerOnInit,
+
+                            lastInputChanged: $(this)
+
+                        }
 
                     }
 
                 });
+
+                // Put the group's dirty flag to true if any element is dirty at the beginning
+                //  and we want previous changes to trigger.
+                if (options.monitorizeAsGroup && $(this).val() && options.triggerOnInit) {
+
+                    var data = $(this).data('monitorize')._data.group;
+
+                    data.isValueDirty = true;
+
+                    data.lastInputChanged = $(this);
+
+                }
 
                 // Bind keyup event
                 $(this).on('keyup', methods._onKeyUp);
@@ -76,10 +117,19 @@
                 // Bind change event
                 $(this).on('change', methods._onChange);
 
-                // Start timer
-                methods._restartTimer.call(this);
-
             });
+
+            // Skip if empty list
+            if (monitorizedGroup.length == 0) {
+
+                return monitorizedGroup;
+
+            }
+
+            // Start timer
+            methods._restartTimer.call(this);
+
+            return monitorizedGroup;
 
         },
 
@@ -89,16 +139,19 @@
             methods._clearTimer.call(this);
 
             // Unbind keyup event
-            $(this).unbind('keyup', methods._onKeyUp);
+            this.unbind('keyup', methods._onKeyUp);
 
             // Unbind paste event
-            $(this).unbind('paste', methods._onPaste);
+            this.unbind('paste', methods._onPaste);
 
             // Unbind change event
-            $(this).unbind('change', methods._onChange);
+            this.unbind('change', methods._onChange);
 
             // Remove monitorize data
-            $(this).data('monitorize', null);
+            this.data('monitorize', null);
+
+            // Return the object for chaining purposes
+            return this;
 
         },
 
@@ -109,7 +162,10 @@
                 options = $(this).data('monitorize').options;
 
             // Mark value as dirty
-            data.isValueDirty = true;
+            data.group.isValueDirty = true;
+
+            // Update last input changed
+            data.group.lastInputChanged = $(this);
 
             // Skip if didn't pressed a triggering key code
             if (options.triggerKeyCodes
@@ -132,7 +188,10 @@
 
                 options = $(this).data('monitorize').options;
 
-            data.isValueDirty = true;
+            data.group.isValueDirty = true;
+
+            // Update last input changed
+            data.group.lastInputChanged = $(this);
 
             // Don't call callback (value isn't accessible yet)
             if (options.pasteTriggers) {
@@ -152,7 +211,10 @@
             // Mark value as dirty
             var data = $(this).data('monitorize')._data;
 
-            data.isValueDirty = true;
+            data.group.isValueDirty = true;
+
+            // Update last input changed
+            data.group.lastInputChanged = $(this);
 
             // Maybe call callback
             methods._maybeCallCallback.call(this);
@@ -161,41 +223,64 @@
 
         _maybeCallCallback: function () {
 
-            // Trim value
-            var value = $.trim($(this).val()),
+            // Initialize vars
+            var data = $(this).data('monitorize')._data,
 
-                data = $(this).data('monitorize')._data,
+                options = $(this).data('monitorize').options,
 
-                options = $(this).data('monitorize').options;
+                skip = false;
 
-            // Skip if value didn't changed
-            if (!data.isValueDirty || value === data.lastValue) {
+            // Skip if no input has changed
+            if (!data.group.lastInputChanged) {
 
-                return;
+                skip = true;
 
             }
 
-            // Skip if empty value
-            if (!options.emptyValueTriggers && !value) {
+            if (!skip) {
 
-                return;
+                // Get last input changed and trim its value
+                var element = data.group.lastInputChanged,
+
+                    value = $.trim(element.val());
+
+                // Get data from last input changed
+                data = element.data('monitorize')._data;
+
+                // Skip if value didn't change
+                if (!data.group.isValueDirty || value === data.lastValue) {
+
+                    skip = true;
+
+                }
+
+                // Skip if empty value
+                if (!options.emptyValueTriggers && !value) {
+
+                    skip = true;
+
+                }
 
             }
 
             // Reset the timer
             methods._restartTimer.call(this);
 
-            // Update last value
-            data.lastValue = value;
+            if (!skip) {
 
-            // Value is not dirty anymore
-            data.isValueDirty = false;
+                // Update last value
+                data.lastValue = value;
 
-            // Call onValueChanged
-            try {
-                options.onValueChanged(value);
-            } catch (error) {
-                // $.error('Error catched in onValueChanged (' +  error + ')');
+                // Value is not dirty anymore
+                data.group.isValueDirty = false;
+
+                // Call onValueChanged
+                try {
+                    options.onValueChanged(value, element);
+                } catch (error) {
+                    $.error('Error catched in onValueChanged (' +  error + ')');
+                }
+
             }
 
         },
@@ -206,9 +291,9 @@
 
                 data = $(this).data('monitorize')._data;
             
-            if (data.timer) {
+            if (data.group.timer) {
 
-                clearInterval(data.timer);
+                clearTimeout(data.group.timer);
 
             }
             
@@ -226,7 +311,7 @@
 
             if (options.frequency) {
 
-                data.timer = setInterval(function () {
+                data.group.timer = setTimeout(function () {
 
                     methods._maybeCallCallback.call(self);
 
@@ -234,7 +319,14 @@
 
             }
 
+        },
+
+        isMonitored: function () {
+
+            return typeof $(this).data('monitorize') !== 'undefined';
+
         }
+
     };
     
     $.fn.monitorize = function (method) {
