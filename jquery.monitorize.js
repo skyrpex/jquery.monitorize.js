@@ -49,9 +49,9 @@
         init: function (options) {
 
             // Options
-            options = $.extend(defaultOptions, options || {}),
+            options = $.extend(defaultOptions, options || {});
 
-            self = this;
+            var self = this;
 
             var groupMonitor = null;
 
@@ -157,9 +157,9 @@
 
         _onKeyUp: function (e) {
 
-            var data = $(this).data('monitorize')._data,
+            var data = $(this).data('monitorize')._data;
 
-                options = $(this).data('monitorize').options;
+            var options = $(this).data('monitorize').options;
 
             // Mark value as dirty
             data.group.isValueDirty = true;
@@ -184,9 +184,9 @@
         _onPaste: function () {
 
             // Mark value as dirty
-            var data = $(this).data('monitorize')._data,
+            var data = $(this).data('monitorize')._data;
 
-                options = $(this).data('monitorize').options;
+            var options = $(this).data('monitorize').options;
 
             data.group.isValueDirty = true;
 
@@ -224,11 +224,11 @@
         _maybeCallCallback: function () {
 
             // Initialize vars
-            var data = $(this).data('monitorize')._data,
+            var data = $(this).data('monitorize')._data;
 
-                options = $(this).data('monitorize').options,
+            var options = $(this).data('monitorize').options;
 
-                skip = false;
+            var skip = false;
 
             // Skip if no input has changed
             if (!data.group.lastInputChanged) {
@@ -240,9 +240,9 @@
             if (!skip) {
 
                 // Get last input changed and trim its value
-                var element = data.group.lastInputChanged,
+                var element = data.group.lastInputChanged;
 
-                    value = $.trim(element.val());
+                var value = $.trim(element.val());
 
                 // Get data from last input changed
                 data = element.data('monitorize')._data;
@@ -287,9 +287,9 @@
         
         _clearTimer: function () {
             
-            var self = this,
+            var self = this;
 
-                data = $(this).data('monitorize')._data;
+            var data = $(this).data('monitorize')._data;
             
             if (data.group.timer) {
 
@@ -301,11 +301,11 @@
 
         _restartTimer: function () {
 
-            var self = this,
+            var self = this;
 
-                data = $(this).data('monitorize')._data,
+            var data = $(this).data('monitorize')._data;
 
-                options = $(this).data('monitorize').options;
+            var options = $(this).data('monitorize').options;
 
             methods._clearTimer.call(this);
 
