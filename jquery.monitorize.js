@@ -224,62 +224,75 @@
         _maybeCallCallback: function () {
 
             // Initialize vars
-            var data = $(this).data('monitorize')._data;
+            var monitorizeData = $(this).data('monitorize');
 
-            var options = $(this).data('monitorize').options;
+            // Stop monitorize if element has no data or has disappeared
+            if (typeof monitorizeData == 'object' && monitorizeData != null) {
 
-            var skip = false;
+                var data = monitorizeData._data;
 
-            // Skip if no input has changed
-            if (!data.group.lastInputChanged) {
+                var options = $(this).data('monitorize').options;
 
-                skip = true;
+                var skip = false;
 
-            }
-
-            if (!skip) {
-
-                // Get last input changed and trim its value
-                var element = data.group.lastInputChanged;
-
-                var value = $.trim(element.val());
-
-                // Get data from last input changed
-                data = element.data('monitorize')._data;
-
-                // Skip if value didn't change
-                if (!data.group.isValueDirty || value === data.lastValue) {
+                // Skip if no input has changed
+                if (!data.group.lastInputChanged) {
 
                     skip = true;
 
                 }
 
-                // Skip if empty value
-                if (!options.emptyValueTriggers && !value) {
+                if (!skip) {
 
-                    skip = true;
+                    // Get last input changed and trim its value
+                    var element = data.group.lastInputChanged;
+
+                    var value = $.trim(element.val());
+
+                    // Get data from last input changed
+                    data = element.data('monitorize')._data;
+
+                    // Skip if value didn't change
+                    if (!data.group.isValueDirty || value === data.lastValue) {
+
+                        skip = true;
+
+                    }
+
+                    // Skip if empty value
+                    if (!options.emptyValueTriggers && !value) {
+
+                        skip = true;
+
+                    }
+
+                }
+
+                // Reset the timer
+                methods._restartTimer.call(this);
+
+                if (!skip) {
+
+                    // Update last value
+                    data.lastValue = value;
+
+                    // Value is not dirty anymore
+                    data.group.isValueDirty = false;
+
+                    // Call onValueChanged
+                    try {
+                        options.onValueChanged(value, element);
+                    } catch (error) {
+                        $.error('Error catched in onValueChanged (' +  error + ')');
+                    }
 
                 }
 
             }
 
-            // Reset the timer
-            methods._restartTimer.call(this);
+            else {
 
-            if (!skip) {
-
-                // Update last value
-                data.lastValue = value;
-
-                // Value is not dirty anymore
-                data.group.isValueDirty = false;
-
-                // Call onValueChanged
-                try {
-                    options.onValueChanged(value, element);
-                } catch (error) {
-                    $.error('Error catched in onValueChanged (' +  error + ')');
-                }
+                methods.destroy.call(this);
 
             }
 
