@@ -188,6 +188,8 @@
 
             var options = $(this).data('monitorize').options;
 
+            var self = this;
+
             data.group.isValueDirty = true;
 
             // Update last input changed
